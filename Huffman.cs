@@ -3,17 +3,20 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
+// Приоритетная очередь
 public class PriorityQueue<T>
 {
     private List<T> data;
     private IComparer<T> comparer;
 
+    // Конструктор
     public PriorityQueue(IComparer<T> comparer)
     {
         this.data = new List<T>();
         this.comparer = comparer;
     }
 
+    // Добавление элемента в очередь
     public void Enqueue(T item)
     {
         data.Add(item);
@@ -27,6 +30,7 @@ public class PriorityQueue<T>
         }
     }
 
+    // Удаление и возврат элемента с наивысшим приоритетом
     public T Dequeue()
     {
         if (data.Count == 0)
@@ -36,26 +40,27 @@ public class PriorityQueue<T>
         return ret;
     }
 
+    // Количество элементов в очереди
     public int Count
     {
         get { return data.Count; }
     }
 
+    // Элемент с наивысшим приоритетом
     public T Min
     {
         get { return data[0]; }
     }
-
 }
 
-// A Tree node
+// Узел дерева
 public class Node
 {
     public char ch;
     public int freq;
     public Node left, right;
 
-    // Constructor
+    // Конструктор
     public Node(char ch, int freq, Node left, Node right)
     {
         this.ch = ch;
@@ -65,25 +70,27 @@ public class Node
     }
 }
 
-// Comparison object to be used to order the heap
+// Объект для сравнения узлов дерева
 public class Comp : IComparer<Node>
 {
+    // Сравнение узлов по частоте
     public int Compare(Node x, Node y)
     {
-        // Highest priority item has lowest frequency
+        // Элемент с наивысшим приоритетом имеет наименьшую частоту
         return x.freq - y.freq;
     }
 }
 
+// Класс для работы с алгоритмом Хаффмана
 class Huffman
 {
-    // Traverse the Huffman Tree and store Huffman Codes in a dictionary
+    // Обход дерева Хаффмана и сохранение кодов Хаффмана в словаре
     public static void Encode(Node root, string str, Dictionary<char, string> huffmanCode)
     {
         if (root == null)
             return;
 
-        // Found a leaf node
+        // Найден листовой узел
         if (root.left == null && root.right == null)
         {
             huffmanCode[root.ch] = str;
@@ -93,14 +100,13 @@ class Huffman
         Encode(root.right, str + "1", huffmanCode);
     }
 
-    // Builds Huffman Tree and decodes given input text
-    // Builds Huffman Tree and decodes given input text
+    // Построение дерева Хаффмана и декодирование заданной входной строки
     public static void BuildHuffmanTree(string inputFilename, string outputFilename)
     {
-        // Read encoded string from input file
+        // Чтение закодированной строки из входного файла
         string encodedStr = File.ReadAllText(inputFilename);
 
-        // Count frequency of appearance of each character and store it in a dictionary
+        // Подсчет частоты каждого символа и сохранение его в словаре
         Dictionary<char, int> freq = new Dictionary<char, int>();
         foreach (char ch in encodedStr)
         {
@@ -110,45 +116,44 @@ class Huffman
                 freq[ch] = 1;
         }
 
-        // Create a priority queue to store live nodes of Huffman tree;
+        // Создание приоритетной очереди для хранения активных узлов дерева Хаффмана
         var pq = new PriorityQueue<Node>(new Comp());
 
-        // Create a leaf node for each character and add it to the priority queue.
+        // Создание листового узла для каждого символа и добавление его в приоритетную очередь
         foreach (var pair in freq)
         {
             pq.Enqueue(new Node(pair.Key, pair.Value, null, null));
         }
 
-        // Do till there is more than one node in the queue
+        // Построение дерева Хаффмана, пока в очереди не останется более одного узла
         while (pq.Count != 1)
         {
-            // Remove the two nodes of highest priority (lowest frequency) from the queue
+            // Удаление двух узлов с наивысшим приоритетом (наименьшей частотой) из очереди
             Node left = pq.Dequeue();
             Node right = pq.Dequeue();
 
-            // Create a new internal node with these two nodes as children and with frequency equal to the sum
-            // of the two nodes' frequencies. Add the new node to the priority queue.
+            // Создание нового внутреннего узла с этими двумя узлами в качестве дочерних и с частотой, равной сумме
+            // частот двух узлов. Добавление нового узла в приоритетную очередь.
             int sum = left.freq + right.freq;
             Node newNode = new Node('\0', sum, left, right);
             pq.Enqueue(newNode);
         }
 
-        // Root stores pointer to root of Huffman Tree
+        // Корень дерева Хаффмана
         Node root = pq.Dequeue();
 
-        // Traverse the Huffman Tree and store Huffman Codes in a dictionary.
+        // Обход дерева Хаффмана и сохранение кодов Хаффмана в словаре
         Dictionary<char, string> huffmanCode = new Dictionary<char, string>();
         Encode(root, "", huffmanCode);
 
-        // Encode the input string using Huffman codes
+        // Кодирование входной строки с использованием кодов Хаффмана
         StringBuilder encodedText = new StringBuilder();
         foreach (char ch in encodedStr)
         {
             encodedText.Append(huffmanCode[ch]);
         }
 
-        // Write the encoded string (as binary) to output file
+        // Запись закодированной строки (в бинарном формате) в выходной файл
         File.WriteAllText(outputFilename, encodedText.ToString());
     }
-
 }

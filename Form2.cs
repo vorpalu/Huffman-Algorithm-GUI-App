@@ -39,7 +39,6 @@ namespace WindowsFormsApp1
 
         private void button1_Click(object sender, EventArgs e)
         {
-            // Проверяем, что объект label2 инициализирован перед его использованием
             label2.Text = CompressionInfo;
         }
     }

@@ -22,6 +22,7 @@ namespace WindowsFormsApp1
         {
             InitializeComponent();
         }
+        //Выход из программы по клавише ESC
         private void Form1_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Escape)
