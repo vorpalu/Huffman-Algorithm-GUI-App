@@ -41,5 +41,6 @@ namespace WindowsFormsApp1
         {
             label2.Text = CompressionInfo;
         }
+
     }
 }
