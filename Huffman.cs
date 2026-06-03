@@ -93,7 +93,10 @@ class Huffman
         // Найден листовой узел
         if (root.left == null && root.right == null)
         {
-            huffmanCode[root.ch] = str;
+            // При наличии единственного уникального символа код может оказаться пустым,
+            // что приведёт к потере данных при кодировании. В этом случае присваиваем
+            // символу хотя бы один бит (например, "0").
+            huffmanCode[root.ch] = str.Length > 0 ? str : "0";
         }
 
         Encode(root.left, str + "0", huffmanCode);
